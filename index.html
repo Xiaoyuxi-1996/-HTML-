@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单片机原理及应用运算转换器 - 山东政法学院网络空间安全学院</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2a4d8e);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(30, 40, 80, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3a5fc9;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #b3e5fc;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(40, 50, 90, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .panel h2 {
+            color: #64b5f6;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #3a5fc9;
+            font-size: 1.4rem;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #bbdefb;
+            font-weight: 500;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #3a5fc9;
+            background: rgba(20, 30, 60, 0.8);
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(to right, #3a5fc9, #2a4d8e);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #4a6fd9, #3a5fc9);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(20, 30, 60, 0.6);
+            border-radius: 8px;
+            border-left: 4px solid #4fc3f7;
+        }
+        
+        .result h3 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #64ffda;
+            word-break: break-all;
+        }
+        
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-buttons button {
+            margin-top: 0;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .explanation {
+            font-size: 0.9rem;
+            color: #90a4ae;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #3a5fc9;
+            color: #90a4ae;
+            font-size: 0.9rem;
+        }
+        
+        .copyright {
+            color: #bbdefb;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单片机原理及应用运算转换器</h1>
+            <p class="subtitle">山东政法学院网络空间安全学院 版权所有</p>
+        </header>
+        
+        <div class="calculator-grid">
+            <!-- 左侧面板：2的幂次方计算 -->
+            <div class="panel">
+                <h2>2的幂次方计算</h2>
+                <div class="input-group">
+                    <label for="exponent">指数 (n)</label>
+                    <input type="number" id="exponent" min="0" max="64" value="8" placeholder="输入指数值">
+                </div>
+                <button id="calculate-power">计算 2<sup>n</sup></button>
+                
+                <div class="result">
+                    <h3>计算结果</h3>
+                    <div class="result-value" id="power-result">2<sup>8</sup> = 256</div>
+                    <div class="explanation">
+                        常用定时器预分频值：2<sup>0</sup>=1, 2<sup>1</sup>=2, 2<sup>2</sup>=4, 2<sup>3</sup>=8, 2<sup>4</sup>=16, 2<sup>5</sup>=32, 2<sup>6</sup>=64, 2<sup>7</sup>=128, 2<sup>8</sup>=256
+                    </div>
+                </div>
+                
+                <div class="preset-buttons">
+                    <button data-exp="0">2<sup>0</sup> (1)</button>
+                    <button data-exp="1">2<sup>1</sup> (2)</button>
+                    <button data-exp="2">2<sup>2</sup> (4)</button>
+                    <button data-exp="3">2<sup>3</sup> (8)</button>
+                    <button data-exp="4">2<sup>4</sup> (16)</button>
+                    <button data-exp="5">2<sup>5</sup> (32)</button>
+                    <button data-exp="6">2<sup>6</sup> (64)</button>
+                    <button data-exp="7">2<sup>7</sup> (128)</button>
+                    <button data-exp="8">2<sup>8</sup> (256)</button>
+                    <button data-exp="16">2<sup>16</sup> (65536)</button>
+                </div>
+            </div>
+            
+            <!-- 右侧面板：进制转换 -->
+            <div class="panel">
+                <h2>进制转换</h2>
+                <div class="input-group">
+                    <label for="input-value">输入数值</label>
+                    <input type="text" id="input-value" placeholder="输入要转换的数值" value="255">
+                </div>
+                
+                <div class="input-group">
+                    <label for="input-base">输入进制</label>
+                    <select id="input-base">
+                        <option value="2">二进制 (2)</option>
+                        <option value="10" selected>十进制 (10)</option>
+                        <option value="16">十六进制 (16)</option>
+                    </select>
+                </div>
+                
+                <button id="convert-base">转换</button>
+                
+                <div class="result">
+                    <h3>转换结果</h3>
+                    <div class="result-value">
+                        <div>二进制: <span id="binary-result">11111111</span></div>
+                        <div>十进制: <span id="decimal-result">255</span></div>
+                        <div>十六进制: <span id="hex-result">0xFF</span></div>
+                    </div>
+                </div>
+                
+                <div class="preset-buttons">
+                    <button data-value="255" data-base="10">常用值 255</button>
+                    <button data-value="65535" data-base="10">常用值 65535</button>
+                    <button data-value="1023" data-base="10">常用值 1023</button>
+                    <button data-value="4095" data-base="10">常用值 4095</button>
+                </div>
+            </div>
+            
+            <!-- 底部面板：基本运算 -->
+            <div class="panel" style="grid-column: 1 / -1;">
+                <h2>基本数学运算</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <div class="input-group">
+                            <label for="operand1">操作数 1</label>
+                            <input type="text" id="operand1" placeholder="输入第一个数" value="1000000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="operator">运算符</label>
+                            <select id="operator">
+                                <option value="+">+ (加法)</option>
+                                <option value="-">- (减法)</option>
+                                <option value="*">× (乘法)</option>
+                                <option value="/">÷ (除法)</option>
+                                <option value="%">% (取模)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="operand2">操作数 2</label>
+                            <input type="text" id="operand2" placeholder="输入第二个数" value="1000">
+                        </div>
+                        
+                        <button id="calculate-math">计算</button>
+                    </div>
+                    
+                    <div class="result">
+                        <h3>运算结果</h3>
+                        <div class="result-value" id="math-result">1000000 ÷ 1000 = 1000</div>
+                        <div class="explanation">
+                            单片机常用计算：<br>
+                            • 定时器频率 = 系统时钟 / (预分频 × 重载值)<br>
+                            • 波特率 = 系统时钟 / (16 × 波特率发生器值)<br>
+                            • ADC分辨率 = 参考电压 / (2<sup>n</sup> - 1)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p class="copyright">© 2023 山东政法学院网络空间安全学院 - 单片机原理及应用运算转换器</p>
+            <p>本工具专为单片机开发中的常用计算设计，支持2的幂次方、进制转换和基本数学运算</p>
+        </footer>
+    </div>
+
+    <script>
+        // 2的幂次方计算
+        document.getElementById('calculate-power').addEventListener('click', calculatePower);
+        document.querySelectorAll('.preset-buttons button[data-exp]').forEach(button => {
+            button.addEventListener('click', function() {
+                const exp = this.getAttribute('data-exp');
+                document.getElementById('exponent').value = exp;
+                calculatePower();
+            });
+        });
+        
+        function calculatePower() {
+            const exponent = parseInt(document.getElementById('exponent').value);
+            if (isNaN(exponent) || exponent < 0) {
+                alert('请输入有效的非负整数指数');
+                return;
+            }
+            
+            // 使用BigInt处理大数
+            const result = BigInt(2) ** BigInt(exponent);
+            document.getElementById('power-result').innerHTML = `2<sup>${exponent}</sup> = ${result.toLocaleString()}`;
+        }
+        
+        // 进制转换
+        document.getElementById('convert-base').addEventListener('click', convertBase);
+        document.querySelectorAll('.preset-buttons button[data-value]').forEach(button => {
+            button.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const base = this.getAttribute('data-base') || '10';
+                document.getElementById('input-value').value = value;
+                document.getElementById('input-base').value = base;
+                convertBase();
+            });
+        });
+        
+        function convertBase() {
+            const inputValue = document.getElementById('input-value').value.trim();
+            const inputBase = parseInt(document.getElementById('input-base').value);
+            
+            if (!inputValue) {
+                alert('请输入要转换的数值');
+                return;
+            }
+            
+            try {
+                // 将输入值转换为十进制
+                let decimalValue;
+                if (inputBase === 16) {
+                    // 处理十六进制前缀
+                    const hexValue = inputValue.startsWith('0x') || inputValue.startsWith('0X') ? 
+                                    inputValue.substring(2) : inputValue;
+                    decimalValue = parseInt(hexValue, 16);
+                } else {
+                    decimalValue = parseInt(inputValue, inputBase);
+                }
+                
+                if (isNaN(decimalValue)) {
+                    throw new Error('无效的输入值');
+                }
+                
+                // 转换为不同进制
+                document.getElementById('binary-result').textContent = decimalValue.toString(2);
+                document.getElementById('decimal-result').textContent = decimalValue.toString(10);
+                document.getElementById('hex-result').textContent = '0x' + decimalValue.toString(16).toUpperCase();
+            } catch (error) {
+                alert('转换错误: ' + error.message);
+            }
+        }
+        
+        // 基本数学运算
+        document.getElementById('calculate-math').addEventListener('click', calculateMath);
+        
+        function calculateMath() {
+            const operand1 = document.getElementById('operand1').value.trim();
+            const operand2 = document.getElementById('operand2').value.trim();
+            const operator = document.getElementById('operator').value;
+            
+            if (!operand1 || !operand2) {
+                alert('请输入两个操作数');
+                return;
+            }
+            
+            try {
+                // 尝试将输入解析为数字（支持十进制、十六进制和二进制）
+                const num1 = parseNumber(operand1);
+                const num2 = parseNumber(operand2);
+                
+                if (isNaN(num1) || isNaN(num2)) {
+                    throw new Error('无效的操作数');
+                }
+                
+                let result;
+                let operatorSymbol;
+                
+                switch (operator) {
+                    case '+':
+                        result = num1 + num2;
+                        operatorSymbol = '+';
+                        break;
+                    case '-':
+                        result = num1 - num2;
+                        operatorSymbol = '-';
+                        break;
+                    case '*':
+                        result = num1 * num2;
+                        operatorSymbol = '×';
+                        break;
+                    case '/':
+                        if (num2 === 0) {
+                            throw new Error('除数不能为零');
+                        }
+                        result = num1 / num2;
+                        operatorSymbol = '÷';
+                        break;
+                    case '%':
+                        if (num2 === 0) {
+                            throw new Error('取模运算的除数不能为零');
+                        }
+                        result = num1 % num2;
+                        operatorSymbol = '%';
+                        break;
+                    default:
+                        throw new Error('未知的运算符');
+                }
+                
+                document.getElementById('math-result').textContent = 
+                    `${num1.toLocaleString()} ${operatorSymbol} ${num2.toLocaleString()} = ${result.toLocaleString()}`;
+                    
+            } catch (error) {
+                alert('计算错误: ' + error.message);
+            }
+        }
+        
+        // 辅助函数：解析数字（支持十进制、十六进制和二进制）
+        function parseNumber(str) {
+            // 处理十六进制
+            if (str.startsWith('0x') || str.startsWith('0X')) {
+                return parseInt(str, 16);
+            }
+            
+            // 处理二进制
+            if (str.startsWith('0b') || str.startsWith('0B')) {
+                return parseInt(str.substring(2), 2);
+            }
+            
+            // 默认为十进制
+            return parseFloat(str);
+        }
+        
+        // 初始化计算
+        window.onload = function() {
+            calculatePower();
+            convertBase();
+            calculateMath();
+        };
+    </script>
+</body>
+</html>
